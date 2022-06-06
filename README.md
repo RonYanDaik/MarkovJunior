@@ -1,3 +1,8 @@
+
+# Fork of original MarkovJunior repostiory to add primitive UI
+**This breaks functionality in the original MarkovJunior, use at own risk**
+
+
 # MarkovJunior
 MarkovJunior is a probabilistic programming language where programs are combinations of rewrite rules and inference is performed via constraint propagation. MarkovJunior is named after mathematician [Andrey Andreyevich Markov](https://en.wikipedia.org/wiki/Andrey_Markov,_Jr.), who defined and studied what is now called [Markov algorithms](https://en.wikipedia.org/wiki/Markov_algorithm).
 <p align="center">
