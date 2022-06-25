@@ -3,7 +3,10 @@
   <!--<model name="Wilson" size="59" steps="1000" gui="150" gif="True"/>-->
   <!--<model name="BasicSnake" size="23" steps="100" gif="True"/>-->
   <!--<model name="Chase" size="60" steps="200" gif="True"/>-->
-  <model name="Basic" size="100" steps="1000" gui="150" gif="True"/>
+  <!--<model name="Basic" size="100" steps="1000" gui="150" gif="True"/>-->
+  
+  <!--<model name="Basic" size="100" steps="100" gui="150" gif="False" amount="2"/>-->
+  <model name="ForestFire" size="100" steps="10000" gui="150" gif="True"/>
 
   <!--<model name="MultiSokoban9" size="9" amount="1" pixelsize="20" gif="True"/>-->
   <!--<model name="MultiSokoban8" size="8" amount="1" pixelsize="20" gif="True"/>-->

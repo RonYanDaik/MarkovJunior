@@ -61,7 +61,7 @@ static class Program
             for (int k = 0; k < amount; k++)
             {
                 int seed = seeds != null && k < seeds.Length ? seeds[k] : meta.Next();
-                foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, steps, gif))
+                foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, steps, 5,gif))
                 {
                     int[] colors = legend.Select(ch => palette[ch]).ToArray();
                     var counter = interpreter.counter.ToString("00000000.##");
@@ -124,7 +124,7 @@ static class Program
             int[] seeds = seedString?.Split(' ').Select(s => int.Parse(s)).ToArray();
             bool gif = xmodel.Get("gif", false);
             bool iso = xmodel.Get("iso", false);
-            int steps = xmodel.Get("steps", gif ? 1000 : 50000);
+            int maxSteps = xmodel.Get("steps", gif ? 1000 : 50000);
             int gui = xmodel.Get("gui", 0);
             if (gif) amount = 1;
 
@@ -158,10 +158,9 @@ static class Program
                 {
 
                     int seed = seeds != null && k < seeds.Length ? seeds[k] : meta.Next();
-                    foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, steps, gif))
+                    foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, maxSteps, 2, gif))
                     {
-                        //Should time between loops
-                        System.Threading.Thread.Sleep(10);
+                        window.SetFramerateLimit(10);
                         // Update objects
                         window.DispatchEvents();
 

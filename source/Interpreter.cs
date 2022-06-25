@@ -60,7 +60,7 @@ class Interpreter
         return ip;
     }
 
-    public IEnumerable<(byte[], char[], int, int, int)> Run(int seed, int steps, bool gif)
+    public IEnumerable<(byte[], char[], int, int, int)> Run(int seed, int maxSteps, int steps, bool gif)
     {
         random = new Random(seed);
         grid = startgrid;
@@ -80,7 +80,7 @@ class Interpreter
 
         this.gif = gif;
         counter = 0;
-        while (current != null && (steps <= 0 || counter < steps))
+        while (current != null && (maxSteps <= 0 || counter < maxSteps))
         {
             if (gif)
             {
@@ -88,9 +88,12 @@ class Interpreter
                 yield return (grid.state, grid.characters, grid.MX, grid.MY, grid.MZ);
             }
 
-            current.Go();
-            counter++;
-            first.Add(changes.Count);
+            for (int i = 0; i < steps; i++)
+            {
+                current.Go();
+                counter++;
+                first.Add(changes.Count);
+            }
         }
 
         yield return (grid.state, grid.characters, grid.MX, grid.MY, grid.MZ);
