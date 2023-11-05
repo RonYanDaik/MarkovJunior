@@ -84,7 +84,7 @@ class Interpreter
         {
             if (gif)
             {
-                Console.WriteLine($"[{counter}]");
+                //Console.WriteLine($"[{counter}]");
                 yield return (grid.state, grid.characters, grid.MX, grid.MY, grid.MZ);
             }
 
@@ -92,7 +92,7 @@ class Interpreter
             {
                 if(current == null)
                     break;
-                    
+
                 current.Go();
                 counter++;
                 first.Add(changes.Count);

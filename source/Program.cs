@@ -99,6 +99,9 @@ static class Program
 
         foreach (XElement xmodel in xdoc.Root.Elements("model"))
         {
+            if(close)
+                break;
+
             string name = xmodel.Get<string>("name");
             int linearSize = xmodel.Get("size", -1);
             int dimension = xmodel.Get("d", 2);
@@ -127,10 +130,11 @@ static class Program
             int pixelsize = xmodel.Get("pixelsize", 10);
             string seedString = xmodel.Get<string>("seeds", null);
             int[] seeds = seedString?.Split(' ').Select(s => int.Parse(s)).ToArray();
-            bool gif = xmodel.Get("gif", false);
-            bool iso = xmodel.Get("iso", false);
-            int maxSteps = xmodel.Get("steps", gif ? 1000 : 50000);
-            int gui = xmodel.Get("gui", 0);
+            bool gif = xmodel.Get("gif", true);
+            bool iso = xmodel.Get("iso", true);
+            int maxSteps = xmodel.Get("steps", gif ? 5000 : 50000);
+            int gui = xmodel.Get("gui", 120);
+            
             if (gif) 
                 amount = 1;
 
@@ -155,9 +159,6 @@ static class Program
 
             SFML.Graphics.Sprite sprite = new SFML.Graphics.Sprite(tex);
             sprite.Texture = tex;
-            //sfml_image.create(20, 20, sf::Color::Black);
-            // var grid = new VGrid(3, 3);
-            VGrid.gui_setup gui_su;
 
             //while (window.IsOpen)
             {
@@ -173,6 +174,7 @@ static class Program
                     {
                         if(close)
                             break;
+                        
                         window.SetFramerateLimit(25);
                         // Update objects
                         window.DispatchEvents();
@@ -196,16 +198,14 @@ static class Program
                             if (gui > 0) 
                                 GUI.Draw(name, interpreter.root, interpreter.current, bitmap, WIDTH, HEIGHT, palette);
                             
-                            Graphics.SaveBitmap(bitmap, WIDTH, HEIGHT, outputname + ".png");
-                            
-                            gui_su.gui = gui;
+                            //Graphics.SaveBitmap(bitmap, WIDTH, HEIGHT, outputname + ".png");
                             
                             if(pixels.Length!=(WIDTH * HEIGHT * 4)){
                                 tex = new Texture((uint)WIDTH,(uint)HEIGHT);
                                 pixels = new byte[WIDTH * HEIGHT * 4];
                             }
                             
-                            rects = grid.Update(result, colors, pixelsize, gui_su);
+                            //rects = grid.Update(result, colors, pixelsize, gui_su);
                             //rects = grid.Update2(bitmap, colors, pixelsize, gui_su);
                             //int mask_rvrs = (int)0xFF_00_00_00;
                             int mask = 0x00_FF;
@@ -234,12 +234,23 @@ static class Program
                             }
                             tex.Update(pixels);
                             sprite.Texture = tex;
-                            sprite.TextureRect =new IntRect(new Vector2i( 0 /2 , 0 /2),new Vector2i(WIDTH, HEIGHT));
-                            window.Draw(sprite);
-                            if(WIDTH>window.Size.Y || HEIGHT>window.Size.X)
+                            Console.WriteLine($"WIDTH,HEIGHT = ({WIDTH}, {HEIGHT}) | {window.Size}");
+                            if((WIDTH )>window.Size.X || (HEIGHT)>window.Size.Y)
                             {
-                                window.Size = new Vector2u((uint) HEIGHT,(uint)WIDTH);
-                            }
+                                int w = Math.Min(WIDTH,1200);
+                                int h = Math.Min(HEIGHT,1200);
+                                window.Size = new Vector2u((uint) (w),(uint) h);
+                                sprite.TextureRect = new IntRect(new Vector2i( 0 , 0),new Vector2i(WIDTH, HEIGHT));
+
+                                if((HEIGHT )>1200 || (WIDTH )>1200)
+                                {
+                                    // sprite.TextureRect = new IntRect(new Vector2i( 0  , 0),new Vector2i(WIDTH / pixelsize, HEIGHT/ pixelsize));
+                                    
+                                }
+                            }else
+                                sprite.TextureRect = new IntRect(new Vector2i( 0 , 0),new Vector2i((int)WIDTH,(int) HEIGHT));
+                            window.Draw(sprite);
+
                             //window.Draw(bitmap);
 
                         }
