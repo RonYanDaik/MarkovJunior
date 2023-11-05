@@ -12,6 +12,7 @@ using SFML.System;
 
 static class Program
 {
+    static bool close = false;
     static void MainOld()
     {
         Stopwatch sw = Stopwatch.StartNew();
@@ -70,7 +71,7 @@ static class Program
                     if (FZ == 1 || iso)
                     {
                         var (bitmap, WIDTH, HEIGHT) = Graphics.Render(result, FX, FY, FZ, colors, pixelsize, gui);
-                        if (gui > 0) GUI.Draw(name, interpreter.root, interpreter.current, bitmap, WIDTH, HEIGHT, palette);
+                        //if (gui > 0) GUI.Draw(name, interpreter.root, interpreter.current, bitmap, WIDTH, HEIGHT, palette);
                         Graphics.SaveBitmap(bitmap, WIDTH, HEIGHT, outputname + ".png");
                     }
                     else VoxHelper.SaveVox(result, (byte)FX, (byte)FY, (byte)FZ, colors, outputname + ".vox");
@@ -89,9 +90,13 @@ static class Program
 
         Dictionary<char, int> palette = XDocument.Load("resources/palette.xml").Root.Elements("color").ToDictionary(x => x.Get<char>("symbol"), x => Convert.ToInt32(x.Get<string>("value"), 16) + (255 << 24));
         Dictionary<char, string> rgbpalette = XDocument.Load("resources/palette.xml").Root.Elements("color").ToDictionary(x => x.Get<char>("symbol"), x => x.Get<string>("rgb"));
+        
 
         Random meta = new();
         XDocument xdoc = XDocument.Load("models.xml", LoadOptions.SetLineInfo);
+        
+        RenderWindow window = new RenderWindow(new VideoMode(1000, 1000), "Hello SFML.Net!", Styles.Close, new ContextSettings(24, 8, 2));
+
         foreach (XElement xmodel in xdoc.Root.Elements("model"))
         {
             string name = xmodel.Get<string>("name");
@@ -126,17 +131,11 @@ static class Program
             bool iso = xmodel.Get("iso", false);
             int maxSteps = xmodel.Get("steps", gif ? 1000 : 50000);
             int gui = xmodel.Get("gui", 0);
-            if (gif) amount = 1;
-
-
-
-
-
-
+            if (gif) 
+                amount = 1;
 
 
             // create the window.
-            RenderWindow window = new RenderWindow(new VideoMode(1000, 1000), "Hello SFML.Net!", Styles.Close, new ContextSettings(24, 8, 2));
             window.SetVerticalSyncEnabled(true);
             window.SetActive();
 
@@ -149,44 +148,111 @@ static class Program
             Clock clock = new Clock();
 
             var grid = new VGrid(MX, MY);
-            // var grid = new VGrid(3, 3);
+            byte[] pixels = new byte[MX * MY * 4];
+            Texture tex = new Texture((uint)MX,(uint)MY);
+            
+            //Image sfml_image;
 
-            while (window.IsOpen)
+            SFML.Graphics.Sprite sprite = new SFML.Graphics.Sprite(tex);
+            sprite.Texture = tex;
+            //sfml_image.create(20, 20, sf::Color::Black);
+            // var grid = new VGrid(3, 3);
+            VGrid.gui_setup gui_su;
+
+            //while (window.IsOpen)
             {
+                Dictionary<char, int> customPalette = new(palette);
+                foreach (var x in xmodel.Elements("color")) customPalette[x.Get<char>("symbol")] = (255 << 24) + Convert.ToInt32(x.Get<string>("value"), 16);
 
                 for (int k = 0; k < amount; k++)
                 {
-
+                    if(close)
+                        break;
                     int seed = seeds != null && k < seeds.Length ? seeds[k] : meta.Next();
                     foreach ((byte[] result, char[] legend, int FX, int FY, int FZ) in interpreter.Run(seed, maxSteps, 2, gif))
                     {
-                        window.SetFramerateLimit(10);
+                        if(close)
+                            break;
+                        window.SetFramerateLimit(25);
                         // Update objects
                         window.DispatchEvents();
 
                         // Display objects
-                        window.Clear(new Color((byte)50, (byte)50, (byte)180));
+                        window.Clear(new Color((byte)50, (byte)50, (byte)50));
 
                         List<RectangleShape> rects = new List<RectangleShape>();
+                        
+                        int[] colors2 = legend.Select(ch => customPalette[ch]).ToArray();
 
                         string[] colors = legend.Select(ch => rgbpalette[ch]).ToArray();
+
                         var counter = interpreter.counter.ToString("00000000.##");
 
                         string outputname = gif ? $"output/{counter}" : $"output/{name}_{seed}";
+                        
                         if (FZ == 1 || iso)
                         {
-                            // var (bitmap, WIDTH, HEIGHT) = Graphics.Render(result, FX, FY, FZ, colors, pixelsize, gui);
-                            // if (gui > 0) GUI.Draw(name, interpreter.root, interpreter.current, bitmap, WIDTH, HEIGHT, palette);
-                            //Graphics.SaveBitmap(bitmap, WIDTH, HEIGHT, outputname + ".png");
-                            rects = grid.Update(result, colors, pixelsize);
+                            var (bitmap, WIDTH, HEIGHT) = Graphics.Render(result, FX, FY, FZ, colors2, pixelsize, gui);
+                            if (gui > 0) 
+                                GUI.Draw(name, interpreter.root, interpreter.current, bitmap, WIDTH, HEIGHT, palette);
+                            
+                            Graphics.SaveBitmap(bitmap, WIDTH, HEIGHT, outputname + ".png");
+                            
+                            gui_su.gui = gui;
+                            
+                            if(pixels.Length!=(WIDTH * HEIGHT * 4)){
+                                tex = new Texture((uint)WIDTH,(uint)HEIGHT);
+                                pixels = new byte[WIDTH * HEIGHT * 4];
+                            }
+                            
+                            rects = grid.Update(result, colors, pixelsize, gui_su);
+                            //rects = grid.Update2(bitmap, colors, pixelsize, gui_su);
+                            //int mask_rvrs = (int)0xFF_00_00_00;
+                            int mask = 0x00_FF;
+                             // * 4 because pixels have 4 components (RGBA)
+                            for (int h = 0; h < HEIGHT; h++)
+                            {
+                                for (int w = 0; w < WIDTH; w++)
+                                {
+                                    int col = (int)bitmap[h*WIDTH + w];
+                                    
+                                    int aval = (mask) & (int)(col >> 24) ;
+                                    //aval = aval;
+                                    int rval = (mask) & (int)(col >>16 );
+                                    //rval = rval;
+                                    int gval = (mask) & (int)(col>>8 );
+                                    //gval = gval;
+                                    int bval = (mask) & (int)(col);
+                                    //bval = bval>>0;
+                                    
+                                    pixels[(h* WIDTH + w)*4 + 0] = (byte)rval;
+                                    pixels[(h* WIDTH + w)*4 + 1] = (byte)gval;
+                                    pixels[(h* WIDTH + w)*4 + 2] = (byte)bval;
+                                    pixels[(h* WIDTH + w)*4 + 3] = (byte)aval;
+
+                                }
+                            }
+                            tex.Update(pixels);
+                            sprite.Texture = tex;
+                            sprite.TextureRect =new IntRect(new Vector2i( 0 /2 , 0 /2),new Vector2i(WIDTH, HEIGHT));
+                            window.Draw(sprite);
+                            if(WIDTH>window.Size.Y || HEIGHT>window.Size.X)
+                            {
+                                window.Size = new Vector2u((uint) HEIGHT,(uint)WIDTH);
+                            }
+                            //window.Draw(bitmap);
+
                         }
                         // else VoxHelper.SaveVox(result, (byte)FX, (byte)FY, (byte)FZ, colors, outputname + ".vox");
 
-                        foreach (var rect in rects)
-                        {
+                        /*foreach (var rect in rects)
+                        {   
+                            rect.Position =rect.Position + new Vector2f(1000.0f*0.5f - MX *0.5f * pixelsize,1000.0f*0.5f - MY *0.5f*pixelsize);
                             window.Draw(rect);
-                        }
+                        }*/
+
                         window.Display();
+                        
                     }
                     Console.WriteLine("DONE");
                 }
@@ -218,6 +284,7 @@ static class Program
     {
         RenderWindow window = (RenderWindow)sender;
         window.Close();
+        close = true;
     }
     static void OnKeyPressed(object sender, KeyEventArgs e)
     {

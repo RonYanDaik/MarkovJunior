@@ -2,6 +2,7 @@
 
 using System;
 using System.Linq;
+using System.Xml.Linq;
 using System.Collections.Generic;
 
 static class GUI
@@ -13,8 +14,8 @@ static class GUI
     const string FONT = "Tamzen8x16r", TITLEFONT = "Tamzen8x16b";
     static readonly bool DENSE = true, D3 = true;
 
-    public const int BACKGROUND = (255 << 24) + (34 << 16) + (34 << 8) + 34;
-    const int IVALUE = 102, INACTIVE = (255 << 24) + (IVALUE << 16) + (IVALUE << 8) + IVALUE, ACTIVE = -1;
+    public static readonly int BACKGROUND = (255 << 24) + (34 << 16) + (34 << 8) + 34;
+    public static readonly int IVALUE = 102, INACTIVE = (255 << 24) + (IVALUE << 16) + (IVALUE << 8) + IVALUE, ACTIVE = -1;
 
     static (bool[], int FX, int FY)[] fonts;
 
@@ -35,6 +36,18 @@ static class GUI
         b0 = bitmap[0];
         b1 = bitmap[width - 1];
         fonts[1] = (bitmap.Select(argb => argb != b0 && argb != b1).ToArray(), width / 32, height / 3);
+
+        XElement settings;
+        try{
+            settings = XDocument.Load("resources/settings.xml").Root;
+        }catch(Exception e)
+        {
+            settings = new XElement("Name");
+        }
+
+        BACKGROUND = (255 << 24) + Convert.ToInt32(settings.Get("background", "222222"), 16);
+        INACTIVE = (255 << 24) + Convert.ToInt32(settings.Get("inactive", "666666"), 16);
+        ACTIVE = (255 << 24) + Convert.ToInt32(settings.Get("active", "ffffff"), 16);
     }
 
     public static void Draw(string name, Branch root, Branch current, int[] bitmap, int WIDTH, int HEIGHT, Dictionary<char, int> palette)
@@ -42,15 +55,20 @@ static class GUI
         void drawRectangle(int x, int y, int width, int height, int color)
         {
             if (y + height > HEIGHT) return;
-            for (int dy = 0; dy < height; dy++) for (int dx = 0; dx < width; dx++) bitmap[x + dx + (y + dy) * WIDTH] = color;
+            for (int dy = 0; dy < height; dy++) 
+                for (int dx = 0; dx < width; dx++) 
+                    bitmap[x + dx + (y + dy) * WIDTH] = color;
         };
+
         void drawSquare(int x, int y, int S, char c) => drawRectangle(x, y, S, S, palette[c]);
+
         void drawShadedSquare(int x, int y, int S, int color)
         {
             drawRectangle(x, y, S, S, color);
             drawRectangle(x + S, y, 1, S + 1, BACKGROUND);
             drawRectangle(x, y + S, S + 1, 1, BACKGROUND);
         };
+
         void drawHLine(int x, int y, int length, int color, bool dashed = false)
         {
             if (length <= 0 || x < 0 || x + length >= WIDTH) return;
@@ -62,12 +80,14 @@ static class GUI
                 for (int dx = 0; dx < length; dx++) if ((dx + shift) / 2 % 2 == 0) bitmap[x + dx + y * WIDTH] = color;
             }
         }
+
         void drawVLine(int x, int y, int height, int color)
         {
             if (x < 0) return;
             int yend = Math.Min(y + height, HEIGHT);
             drawRectangle(x, y, 1, yend - y, color);
         }
+
         int write(string s, int x, int y, int color, int font = 0)
         {
             int fontshift = font == 0 ? FONTSHIFT : 0;
@@ -84,6 +104,7 @@ static class GUI
         };
 
         Dictionary<Node, (int level, int height)> lh = new();
+
         void drawDash(Node node, bool markov, bool active)
         {
             if (node == root) return;
@@ -91,6 +112,7 @@ static class GUI
             int extra = markov ? 3 : 1;
             drawHLine(level * HINDENT - HLINE - HGAP - extra, height + S / 2, (node is MarkovNode || node is SequenceNode ? HINDENT : HLINE) + extra, active ? ACTIVE : INACTIVE);
         };
+
         void drawBracket(Branch branch, int level, int n, bool active)
         {
             int first = lh[branch.nodes[0]].height;
@@ -101,6 +123,7 @@ static class GUI
             drawVLine(x, first + S / 2, last - first + 1, color);
             drawVLine(x - (markov ? 3 : 1), first + S / 2, last - first + 1, color);
         };
+
         int drawArray(byte[] a, int x, int y, int MX, int MY, int MZ, char[] characters, int S)
         {
             for (int dz = 0; dz < MZ; dz++) for (int dy = 0; dy < MY; dy++) for (int dx = 0; dx < MX; dx++)
@@ -111,6 +134,7 @@ static class GUI
                     }
             return MX * S + (MZ - 1) * ZSHIFT;
         };
+
         void drawSample(int x, int y, bool[] sample, int MX, int MY, byte c0, byte c1, char[] characters, int S)
         {
             for (int dy = 0; dy < MY; dy++) for (int dx = 0; dx < MX; dx++)

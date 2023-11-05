@@ -1,25 +1,26 @@
 <models>
   gifs
-  <!--<model name="Wilson" size="59" steps="1000" gui="150" gif="True"/>-->
-  <!--<model name="BasicSnake" size="23" steps="100" gif="True"/>-->
-  <!--<model name="Chase" size="60" steps="200" gif="True"/>-->
-  <!--<model name="Basic" size="100" steps="1000" gui="150" gif="True"/>-->
-  
-  <!--<model name="Basic" size="100" steps="100" gui="150" gif="False" amount="2"/>-->
-  <model name="ForestFire" size="100" steps="10000" gui="150" gif="True"/>
+  <model name="BasicSnake" size="35" steps="500" gui="150" gif="True"/>
+  <model name="Wilson" size="59" steps="400" gui="150" gif="True"/>
 
-  <!--<model name="MultiSokoban9" size="9" amount="1" pixelsize="20" gif="True"/>-->
-  <!--<model name="MultiSokoban8" size="8" amount="1" pixelsize="20" gif="True"/>-->
-  <!--<model name="SokobanLevel1" length="14" width="9" amount="1" pixelsize="21" gif="True"/>-->
-  <!--<model name="SokobanLevel2" length="5" width="4" amount="1" pixelsize="21" gif="True"/>-->
-  <!--<model name="SequentialSokoban" size="20" gif="True"/>-->
+  <model name="Chase" size="60" steps="500" gui="150" gif="True"/> 
+  <model name="Basic" size="100" steps="1000" gui="150" gif="True"/>
+  
+  <model name="Basic" size="100" steps="100" gui="150" gif="False" amount="2"/>
+  <model name="ForestFire" size="100" steps="100" gui="150" gif="True"/>
+
+   <model name="MultiSokoban9" size="9" amount="1" pixelsize="20" gif="True"/> 
+   <model name="MultiSokoban8" size="8" amount="1" pixelsize="20" gif="True"/> 
+   <model name="SokobanLevel1" length="14" width="9" amount="1" pixelsize="21" gif="True"/> 
+   <model name="SokobanLevel2" length="5" width="4" amount="1" pixelsize="21" gif="True"/> 
+   <model name="SequentialSokoban" size="20" gif="True"/> 
 
   benchmarks
-  <!--<model name="MazeGrowth" size="967" amount="20" pixelsize="1" steps="200000"/> 1.7-->
-  <!--<model name="ParallelMazeGrowth" size="967" amount="20" pixelsize="1"/> 2.0-->
-  <!--<model name="MazeBacktracker" size="967" amount="20" pixelsize="1" steps="200000"/> 2.3-->
+   <model name="MazeGrowth" size="967" amount="20" pixelsize="1" steps="200000"/> 1.7 
+   <model name="ParallelMazeGrowth" size="967" amount="20" pixelsize="1"/> 2.0 
+   <model name="MazeBacktracker" size="967" amount="20" pixelsize="1" steps="200000"/> 2.3 
 </models>
 
-<!--
+ 
 
--->
+ 

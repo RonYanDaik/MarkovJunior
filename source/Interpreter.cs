@@ -90,6 +90,9 @@ class Interpreter
 
             for (int i = 0; i < steps; i++)
             {
+                if(current == null)
+                    break;
+                    
                 current.Go();
                 counter++;
                 first.Add(changes.Count);
