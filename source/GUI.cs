@@ -294,6 +294,8 @@ static class GUI
 
         void drawLine(Branch branch)
         {
+            if(branch.nodes.Length==0)
+                return;
             int childLevel = lh[branch.nodes[0]].level;
             drawBracket(branch, childLevel - 1, branch.nodes.Length - 1, false);
             foreach (Node child in branch.nodes) if (child is Branch childBranch) drawLine(childBranch);
@@ -303,7 +305,7 @@ static class GUI
         drawLine(root);
         for (Branch b = current; b != null; b = b.parent)
         {
-            if (b.n >= 0)
+            if (b.n >= 0 && b.nodes.Length > 0)
             {
                 drawDash(b.nodes[b.n], b is MarkovNode, true);
                 drawBracket(b, lh[b.nodes[0]].level - 1, b.n, true);
