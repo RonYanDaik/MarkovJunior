@@ -4,7 +4,8 @@ using System;
 using System.Linq;
 using System.Xml.Linq;
 using System.Collections.Generic;
-
+using System.IO;
+using System.Data;
 class TileNode : WFCNode
 {
     List<byte[]> tiledata;
@@ -106,6 +107,16 @@ class TileNode : WFCNode
             positions.Add(tilename, position);
         }
 
+        using (StreamWriter outputFile = new StreamWriter("test_data/"+"tiledata_test.txt"))
+        {
+            for (int x = 0; x < tiledata.Count; x++)
+            for (int y = 0; y < tiledata[x].Length; y++)
+            {
+                int v = tiledata[x][y];
+                outputFile.WriteLine($"({x}, {y}, 0)\n{v}");
+            }
+        }
+
         P = tiledata.Count;
         Console.WriteLine($"P = {P}");
         weights = tempStationary.ToArray();
@@ -144,6 +155,7 @@ class TileNode : WFCNode
             string[] code = attribute.Split(' ');
             string action = code.Length == 2 ? code[0] : "";
             byte[] starttile = namedTileData[last(attribute)][0];
+            Console.WriteLine(" tile f -> last:"+last(attribute));
             for (int i = action.Length - 1; i >= 0; i--)
             {
                 char sym = action[i];
@@ -162,6 +174,8 @@ class TileNode : WFCNode
         List<string> tilenames = xtiles.Select(x => x.Get<string>("name")).ToList();
         tilenames.Add(null);
 
+        HashSet<string> sides_set = new HashSet<string>();
+        
         foreach (XElement xneighbor in xroot.Element("neighbors").Elements("neighbor"))
         {
             if (fullSymmetry)
@@ -218,6 +232,9 @@ class TileNode : WFCNode
                     return false;
                 }
 
+                sides_set.Add(left);
+                sides_set.Add(right);
+
                 byte[] ltile = tile(left), rtile = tile(right);
                 if (ltile == null || rtile == null) return false;
 
@@ -243,6 +260,9 @@ class TileNode : WFCNode
                     return false;
                 }
 
+                sides_set.Add(top);
+                sides_set.Add(bottom);
+
                 byte[] ttile = tile(top), btile = tile(bottom);
                 if (ttile == null || btile == null) return false;
 
@@ -253,12 +273,44 @@ class TileNode : WFCNode
             }
         }
 
+        {     
+            Console.WriteLine(" + sides_set");
+            foreach( string s in sides_set)
+            {
+                Console.WriteLine(s);
+                
+                string ts = s;
+                ts=ts.Replace(' ','_');
+                using (StreamWriter outputFile = new StreamWriter("test_data/"+ts+"_tile_test.txt"))
+                {
+                    byte[] ttile = tile(s);
+                    for (int x = 0; x < ttile.Length; x++)
+                    {
+                        int v = Convert.ToInt32(ttile[x]);
+                        outputFile.WriteLine($"({x}, 0, 0)\n{v}");
+                    }
+                }
+            }
+            Console.WriteLine(" - sides_set");
+        }
+
         for (int p2 = 0; p2 < P; p2++) for (int p1 = 0; p1 < P; p1++)
             {
                 tempPropagator[2][p2][p1] = tempPropagator[0][p1][p2];
                 tempPropagator[3][p2][p1] = tempPropagator[1][p1][p2];
                 tempPropagator[5][p2][p1] = tempPropagator[4][p1][p2];
             }
+
+        using (StreamWriter outputFile = new StreamWriter("test_data/"+"tempPropagator_test.txt"))
+        {
+            for (int x = 0; x < tempPropagator.Length; x++)
+            for (int y = 0; y < tempPropagator[x].Length; y++)
+            for (int z = 0; z < tempPropagator[x][y].Length; z++)
+            {
+                int v = Convert.ToInt32(tempPropagator[x][y][z]);
+                outputFile.WriteLine($"({x}, {y}, {z})\n{v}");
+            }
+        }
 
         List<int>[][] sparsePropagator = new List<int>[6][];
         for (int d = 0; d < 6; d++)
@@ -281,6 +333,17 @@ class TileNode : WFCNode
                 int ST = sp.Count;
                 propagator[d][p1] = new int[ST];
                 for (int st = 0; st < ST; st++) propagator[d][p1][st] = sp[st];
+            }
+        }
+
+        using (StreamWriter outputFile = new StreamWriter("test_data/"+"propagator_test.txt"))
+        {
+            for (int x = 0; x < propagator.Length; x++)
+            for (int y = 0; y < propagator[x].Length; y++)
+            for (int z = 0; z < propagator[x][y].Length; z++)
+            {
+                int v = propagator[x][y][z];
+                outputFile.WriteLine($"({x}, {y}, {z})\n{v}");
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿// Copyright (C) 2022 Maxim Gumin, The MIT License (MIT)
 
 using System;
+using System.IO;
 using System.Xml.Linq;
 using System.Collections.Generic;
 
@@ -68,10 +69,21 @@ abstract class WFCNode : Branch
     Random random;
     public override bool Go()
     {
-        if (n >= 0) return base.Go();
+        if (n >= 0) 
+            return base.Go();
 
         if (firstgo)
         {
+            Directory.CreateDirectory("test_data/"+ip.modelName+"/"+name + "/");
+            using (StreamWriter outputFile = new StreamWriter("test_data/"+ip.modelName+"/"+name + "/first_go_grid_test.txt"))
+            {
+                for (int x = 0; x < grid.state.Length; x++)
+                {
+                    int v = grid.state[x];
+                    outputFile.WriteLine($"({x}, 0, 0)\n{v}");
+                }
+            }
+
             wave.Init(propagator, sumOfWeights, sumOfWeightLogWeights, startingEntropy, shannon);
 
             for (int i = 0; i < wave.data.Length; i++)
@@ -80,7 +92,9 @@ abstract class WFCNode : Branch
                 if (map.ContainsKey(value))
                 {
                     bool[] startWave = map[value];
-                    for (int t = 0; t < P; t++) if (!startWave[t]) Ban(i, t);
+                    for (int t = 0; t < P; t++) 
+                        if (!startWave[t]) 
+                            Ban(i, t);
                 }
             }
 
@@ -92,7 +106,8 @@ abstract class WFCNode : Branch
             }
             startwave.CopyFrom(wave, propagator.Length, shannon);
             int? goodseed = GoodSeed();
-            if (goodseed == null) return false;
+            if (goodseed == null) 
+                return false;
 
             random = new Random((int)goodseed);
             stacksize = 0;
@@ -111,9 +126,10 @@ abstract class WFCNode : Branch
                 Observe(node, random);
                 Propagate();
             }
-            else n++;
+                else n++;
 
-            if (n >= 0 || ip.gif) UpdateState();
+            if (n >= 0 || ip.gif) 
+                UpdateState();
             return true;
         }
     }
@@ -159,15 +175,19 @@ abstract class WFCNode : Branch
         int MX = grid.MX, MY = grid.MY, MZ = grid.MZ;
         double min = 1E+4;
         int argmin = -1;
-        for (int z = 0; z < MZ; z++) for (int y = 0; y < MY; y++) for (int x = 0; x < MX; x++)
+        for (int z = 0; z < MZ; z++) 
+            for (int y = 0; y < MY; y++) 
+                for (int x = 0; x < MX; x++)
                 {
-                    if (!periodic && (x + N > MX || y + N > MY || z + 1 > MZ)) continue;
+                    if (!periodic && (x + N > MX || y + N > MY || z + 1 > MZ)) 
+                        continue;
                     int i = x + y * MX + z * MX * MY;
                     int remainingValues = wave.sumsOfOnes[i];
                     double entropy = shannon ? wave.entropies[i] : remainingValues;
                     if (remainingValues > 1 && entropy <= min)
                     {
-                        double noise = 1E-6 * random.NextDouble();
+                        double next_dbl = random.NextDouble(); //;
+                        double noise = 1E-6 * next_dbl;
                         if (entropy + noise < min)
                         {
                             min = entropy + noise;
@@ -175,6 +195,8 @@ abstract class WFCNode : Branch
                         }
                     }
                 }
+        if(argmin==-1)
+            return -1;
         return argmin;
     }
 
@@ -182,8 +204,10 @@ abstract class WFCNode : Branch
     {
         bool[] w = wave.data[node];
         for (int t = 0; t < P; t++) distribution[t] = w[t] ? weights[t] : 0.0;
-        int r = distribution.Random(random.NextDouble());
-        for (int t = 0; t < P; t++) if (w[t] != (t == r)) Ban(node, t);
+        int r = distribution.Random(random.NextDouble());//
+        for (int t = 0; t < P; t++) 
+            if (w[t] != (t == r)) 
+                Ban(node, t);
     }
 
     bool Propagate()
@@ -220,7 +244,8 @@ abstract class WFCNode : Branch
                     int[] comp = compat[t2];
 
                     comp[d]--;
-                    if (comp[d] == 0) Ban(i2, t2);
+                    if (comp[d] == 0) 
+                        Ban(i2, t2);
                 }
             }
         }
@@ -309,7 +334,8 @@ class Wave
             for (int t = 0; t < datai.Length; t++)
             {
                 datai[t] = wavedatai[t];
-                for (int d = 0; d < D; d++) compatible[i][t][d] = wave.compatible[i][t][d];
+                for (int d = 0; d < D; d++) 
+                    compatible[i][t][d] = wave.compatible[i][t][d];
             }
 
             sumsOfOnes[i] = wave.sumsOfOnes[i];

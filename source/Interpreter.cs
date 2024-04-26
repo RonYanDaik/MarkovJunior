@@ -20,6 +20,7 @@ class Interpreter
     
     public bool gif;
 
+    public string modelName = "";
     Interpreter() { }
     public static Interpreter Load(XElement xelem, int MX, int MY, int MZ)
     {
@@ -64,13 +65,16 @@ class Interpreter
     {
         random = new Random(seed);
         grid = startgrid;
+
         int originIndex = origin switch
         {
             Origin.Random => random.Next(grid.MX * grid.MY * grid.MZ),
             Origin.Center => grid.MX / 2 + (grid.MY / 2) * grid.MX + (grid.MZ / 2) * grid.MX * grid.MY,
             _ => -1
         };
+
         grid.Clear(originIndex);
+        
         changes.Clear();
         first.Clear();
         first.Add(0);

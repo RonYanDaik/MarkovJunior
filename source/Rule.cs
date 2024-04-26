@@ -3,6 +3,7 @@
 using System.Linq;
 using System.Xml.Linq;
 using System.Collections.Generic;
+using System;
 
 class Rule
 {
@@ -169,6 +170,7 @@ class Rule
     public static Rule Load(XElement xelem, Grid gin, Grid gout)
     {
         int lineNumber = xelem.LineNumber();
+        Console.WriteLine(xelem.ToString());
         string filepath(string name)
         {
             string result = "resources/rules/";

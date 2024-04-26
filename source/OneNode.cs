@@ -8,6 +8,7 @@ class OneNode : RuleNode
 {
     override protected bool Load(XElement xelem, bool[] parentSymmetry, Grid grid)
     {
+        
         if (!base.Load(xelem, parentSymmetry, grid)) return false;
         matches = new List<(int, int, int, int)>();
         matchMask = AH.Array2D(rules.Length, grid.state.Length, false);
@@ -50,7 +51,12 @@ class OneNode : RuleNode
 
     override public bool Go()
     {
-        if (!base.Go()) return false;
+        if (!base.Go()) 
+            return false;
+        
+        Console.WriteLine($"{ip.counter} Go: {xml_text_source}");
+
+
         lastMatchedTurn = ip.counter;
 
         if (trajectory != null)
@@ -62,6 +68,7 @@ class OneNode : RuleNode
         }
 
         var (R, X, Y, Z) = RandomMatch(ip.random);
+        
         if (R < 0) return false;
         else
         {

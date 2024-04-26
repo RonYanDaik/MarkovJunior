@@ -28,8 +28,11 @@ abstract class RuleNode : Node
 
     public bool[] last;
 
+    public string xml_text_source = "";
     override protected bool Load(XElement xelem, bool[] parentSymmetry, Grid grid)
     {
+        xml_text_source = xelem.ToString();
+        
         string symmetryString = xelem.Get<string>("symmetry", null);
         bool[] symmetry = SymmetryHelper.GetSymmetry(grid.MZ == 1, symmetryString, parentSymmetry);
         if (symmetry == null)

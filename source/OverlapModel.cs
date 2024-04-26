@@ -81,7 +81,8 @@ class OverlapNode : WFCNode
 
         int ymax = periodicInput ? grid.MY : grid.MY - N + 1;
         int xmax = periodicInput ? grid.MX : grid.MX - N + 1;
-        for (int y = 0; y < ymax; y++) for (int x = 0; x < xmax; x++)
+        for (int y = 0; y < ymax; y++) 
+            for (int x = 0; x < xmax; x++)
             {
                 byte[][] ps = new byte[8][];
 

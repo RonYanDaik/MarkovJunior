@@ -24,6 +24,7 @@ class MapNode : Branch
             return false;
         }
 
+       
         static (int numerator, int denominator) readScale(string s)
         {
             if (!s.Contains('/')) return (int.Parse(s), 1);
@@ -57,7 +58,9 @@ class MapNode : Branch
 
     static bool Matches(Rule rule, int x, int y, int z, byte[] state, int MX, int MY, int MZ)
     {
-        for (int dz = 0; dz < rule.IMZ; dz++) for (int dy = 0; dy < rule.IMY; dy++) for (int dx = 0; dx < rule.IMX; dx++)
+        for (int dz = 0; dz < rule.IMZ; dz++) 
+            for (int dy = 0; dy < rule.IMY; dy++) 
+                for (int dx = 0; dx < rule.IMX; dx++)
                 {
                     int sx = x + dx;
                     int sy = y + dy;
@@ -68,7 +71,9 @@ class MapNode : Branch
                     if (sz >= MZ) sz -= MZ;
 
                     int inputWave = rule.input[dx + dy * rule.IMX + dz * rule.IMX * rule.IMY];
-                    if ((inputWave & (1 << state[sx + sy * MX + sz * MX * MY])) == 0) return false;
+
+                    if ((inputWave & (1 << state[sx + sy * MX + sz * MX * MY])) == 0) 
+                        return false;
                 }
 
         return true;
@@ -76,7 +81,9 @@ class MapNode : Branch
 
     static void Apply(Rule rule, int x, int y, int z, byte[] state, int MX, int MY, int MZ)
     {
-        for (int dz = 0; dz < rule.OMZ; dz++) for (int dy = 0; dy < rule.OMY; dy++) for (int dx = 0; dx < rule.OMX; dx++)
+        for (int dz = 0; dz < rule.OMZ; dz++) 
+            for (int dy = 0; dy < rule.OMY; dy++) 
+                for (int dx = 0; dx < rule.OMX; dx++)
                 {
                     int sx = x + dx;
                     int sy = y + dy;
@@ -87,7 +94,8 @@ class MapNode : Branch
                     if (sz >= MZ) sz -= MZ;
 
                     byte output = rule.output[dx + dy * rule.OMX + dz * rule.OMX * rule.OMY];
-                    if (output != 0xff) state[sx + sy * MX + sz * MX * MY] = output;
+                    if (output != 0xff) 
+                        state[sx + sy * MX + sz * MX * MY] = output;
                 }
     }
 

@@ -30,7 +30,11 @@ static class SymmetryHelper
         things[7] = reflection(things[6]);  // ba3
 
         List<T> result = new();
-        for (int i = 0; i < 8; i++) if ((subgroup == null || subgroup[i]) && !result.Where(s => same(s, things[i])).Any()) result.Add(things[i]);
+        for (int i = 0; i <  8; i++) 
+            if ((subgroup == null || subgroup[i]) && !result.Where(s => same(s, things[i])).Any()) 
+                result.Add(things[i]);
+        //for (int i = 0; i < 48; i++) if ((subgroup == null || subgroup[i]) && !result.Where(t => same(t, things[i])).Any()) result.Add(things[i]);
+
         return result;
     }
 
@@ -99,10 +103,12 @@ static class SymmetryHelper
         s[47] = r(s[46]);
 
         List<T> result = new();
-        for (int i = 0; i < 48; i++) if ((subgroup == null || subgroup[i]) && !result.Where(t => same(t, s[i])).Any()) result.Add(s[i]);
+        for (int i = 0; i < 48; i++) 
+            if ((subgroup == null || subgroup[i]) && !result.Where(t => same(t, s[i])).Any()) 
+                result.Add(s[i]);
         return result;
     }
-
+    //if result contains any val that is return true in special conpatiyion with s[i]
     public static bool[] GetSymmetry(bool d2, string s, bool[] dflt)
     {
         if (s == null) return dflt;

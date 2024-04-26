@@ -1,5 +1,5 @@
 ﻿// Copyright (C) 2022 Maxim Gumin, The MIT License (MIT)
-
+using System;
 using System.Xml.Linq;
 
 class ParallelNode : RuleNode
@@ -37,6 +37,8 @@ class ParallelNode : RuleNode
     {
         if (!base.Go()) return false;
 
+        Console.WriteLine($"{ip.counter} Go: {xml_text_source}");
+        
         for (int n = ip.first[ip.counter]; n < ip.changes.Count; n++)
         {
             var (x, y, z) = ip.changes[n];

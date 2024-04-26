@@ -81,10 +81,27 @@ abstract class Branch : Node
         for (; n < nodes.Length; n++)
         {
             Node node = nodes[n];
-            if (node is Branch branch) ip.current = branch;
-            if (node.Go()) return true;
+            if (node is Branch branch) 
+            {    
+                ip.current = branch;
+                if(ip.current==null)
+                {
+                    int a = 0;
+                    a++;
+                    Interpreter.WriteLine($"{a}");
+                }
+            }
+            if (node.Go()) 
+                return true;
+        }
+        if(ip.current.parent==null)
+        {
+            int a = 0;
+            a++;
+            Interpreter.WriteLine($"{a}");
         }
         ip.current = ip.current.parent;
+
         Reset();
         return false;
     }
